@@ -1,6 +1,4 @@
-// Backend CORS Configuration Fix
-// Update your src/app.js file with this CORS configuration
-
+// src/app.js
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,10 +18,11 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration - Fixed for credentials
+// CORS configuration - Fixed to allow your frontend domain
 app.use(cors({
-  // Specify the exact origin, not a wildcard
-  origin: "https://tiny-semifreddo-fdd2a6.netlify.app",
+  // Allow specific frontend origins
+  origin: ["https://tiny-semifreddo-fdd2a6.netlify.app", "http://localhost:3000","https://tiny-semifreddo-fdd2a6.netlify.app/api"],
+  // Allow all HTTP methods
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   // Allow these headers in requests
   allowedHeaders: "Content-Type,Authorization",
