@@ -5,7 +5,7 @@ require('dotenv').config();
 const fetch = require('node-fetch');
 
 const API_URL = process.env.API_URL || 'https://backend1223.netlify.app/api';
-const FRONTEND_URL = process.env.CLIENT_URL || 'https://tiny-semifreddo-fdd2a6.netlify.app';
+const FRONTEND_URL = process.env.CLIENT_URL || 'https://tiny-semifreddo-fdd2a6.netlify.app/.netlify/functions';
 
 // Test endpoints
 const endpoints = [
