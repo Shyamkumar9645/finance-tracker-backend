@@ -273,6 +273,27 @@ exports.getDashboardStats = async (req, res) => {
       // Calculate totals
       let totalGiven = 0;
       let totalReceived = 0;
+      let givenCount = 0;
+      let receivedCount = 0;
+
+      // Get transaction counts
+      const countStats = await Transaction.findAll({
+        attributes: [
+          'isMoneyReceived',
+          [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+        ],
+        where: { userId },
+        group: ['isMoneyReceived'],
+        transaction: t
+      });
+
+      countStats.forEach(stat => {
+        if (stat.isMoneyReceived) {
+          receivedCount = parseInt(stat.dataValues.count || 0);
+        } else {
+          givenCount = parseInt(stat.dataValues.count || 0);
+        }
+      });
 
       totalStats.forEach(stat => {
         if (stat.isMoneyReceived) {
@@ -285,7 +306,7 @@ exports.getDashboardStats = async (req, res) => {
       // Calculate balance
       const balance = totalReceived - totalGiven;
 
-      // Get top people who have given money
+      // Get top people who have given money (creditors)
       const topGivers = await Transaction.findAll({
         attributes: [
           'personId',
@@ -307,7 +328,7 @@ exports.getDashboardStats = async (req, res) => {
         transaction: t
       });
 
-      // Get top people who have received money
+      // Get top people who have received money (debtors)
       const topReceivers = await Transaction.findAll({
         attributes: [
           'personId',
@@ -364,14 +385,35 @@ exports.getDashboardStats = async (req, res) => {
         transaction: t
       });
 
+      // Format data for processing in frontend
+      const topCreditorsData = topGivers.map(item => ({
+        personId: item.personId,
+        Person: item.Person,
+        total: parseFloat(item.dataValues.total || 0)
+      }));
+
+      const topDebtorsData = topReceivers.map(item => ({
+        personId: item.personId,
+        Person: item.Person,
+        total: parseFloat(item.dataValues.total || 0)
+      }));
+
+      const transactionsByMonthData = transactionsByMonth.map(item => ({
+        month: item.dataValues.month,
+        isMoneyReceived: item.isMoneyReceived,
+        total: parseFloat(item.dataValues.total || 0)
+      }));
+
       return {
         totalGiven,
         totalReceived,
+        givenCount,
+        receivedCount,
         balance,
-        topGivers,
-        topReceivers,
+        topGivers: topCreditorsData,
+        topReceivers: topDebtorsData,
         recentTransactions,
-        transactionsByMonth
+        transactionsByMonth: transactionsByMonthData
       };
     });
 
@@ -406,7 +448,8 @@ exports.getPersonStats = async (req, res) => {
       const totalStats = await Transaction.findAll({
         attributes: [
           'isMoneyReceived',
-          [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+          [sequelize.fn('SUM', sequelize.col('amount')), 'total'],
+          [sequelize.fn('COUNT', sequelize.col('id')), 'count']
         ],
         where: {
           userId,
@@ -419,12 +462,16 @@ exports.getPersonStats = async (req, res) => {
       // Calculate totals
       let totalGiven = 0;
       let totalReceived = 0;
+      let givenCount = 0;
+      let receivedCount = 0;
 
       totalStats.forEach(stat => {
         if (stat.isMoneyReceived) {
           totalReceived = parseFloat(stat.dataValues.total || 0);
+          receivedCount = parseInt(stat.dataValues.count || 0);
         } else {
           totalGiven = parseFloat(stat.dataValues.total || 0);
+          givenCount = parseInt(stat.dataValues.count || 0);
         }
       });
 
@@ -463,13 +510,22 @@ exports.getPersonStats = async (req, res) => {
         transaction: t
       });
 
+      // Format transactionsByMonth for the frontend
+      const transactionsByMonthData = transactionsByMonth.map(item => ({
+        month: item.dataValues.month,
+        isMoneyReceived: item.isMoneyReceived,
+        total: parseFloat(item.dataValues.total || 0)
+      }));
+
       return {
         person,
         totalGiven,
         totalReceived,
+        givenCount,
+        receivedCount,
         balance,
         transactions,
-        transactionsByMonth
+        transactionsByMonth: transactionsByMonthData
       };
     });
 
@@ -479,7 +535,6 @@ exports.getPersonStats = async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve person statistics' });
   }
 };
-
 // Export transactions as CSV
 exports.exportTransactions = async (req, res) => {
   try {
