@@ -1,4 +1,6 @@
-// src/app.js
+// Backend CORS Configuration Fix
+// Update your src/app.js file with this CORS configuration
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -18,12 +20,19 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration
+// CORS configuration - Fixed for credentials
 app.use(cors({
-  origin: ['https://tiny-semifreddo-fdd2a6.netlify.app', 'http://localhost:3000'],
-  methods: 'GET,POST,PUT,DELETE',
-  allowedHeaders: 'Content-Type, Authorization',
-  credentials: true
+  // Specify the exact origin, not a wildcard
+  origin: "https://tiny-semifreddo-fdd2a6.netlify.app",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  // Allow these headers in requests
+  allowedHeaders: "Content-Type,Authorization",
+  // Allow credentials (cookies, auth headers)
+  credentials: true,
+  // Cache preflight response for 1 hour (3600 seconds)
+  optionsSuccessStatus: 204,
+  preflightContinue: false,
+  maxAge: 3600
 }));
 
 // Request logging
@@ -33,8 +42,8 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Apply rate limiting
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 15 minutes
-  max: 10000, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api', limiter);
