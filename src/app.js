@@ -1,4 +1,4 @@
-// src/app.js
+// src/app.js - Simplified CORS for Option 2 (no credentials)
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -11,57 +11,23 @@ require('dotenv').config();
 // Initialize app
 const app = express();
 
-// Security middleware - but disable for testing CORS issues
-// app.use(helmet());
+// Security middleware with relaxed settings
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 
 // Parse JSON request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-console.log('Setting up CORS for frontend:', process.env.CLIENT_URL);
+console.log('Setting up simplified CORS configuration');
 
-// More permissive CORS for debugging
+// Simple CORS setup - this works well when withCredentials is false
+app.use(cors());
+
+// Log all requests for debugging
 app.use((req, res, next) => {
-  // Log each request for debugging
-  console.log(`${req.method} ${req.url} | Origin: ${req.headers.origin}`);
-  next();
-});
-
-// Set up CORS manually with all headers exposed for debugging
-app.use((req, res, next) => {
-  // Allow requests from these origins
-  const allowedOrigins = [
-    'https://tiny-semifreddo-fdd2a6.netlify.app',
-    'http://localhost:3000'
-  ];
-
-  const origin = req.headers.origin;
-
-  // Check if the origin is in our allowed list
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    // For development, allow all origins (remove in production)
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-
-  // Allow these methods
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
-  // Allow these headers
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-  // Allow credentials
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  // Set preflight cache duration
-  res.setHeader('Access-Control-Max-Age', '3600');
-
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
+  console.log(`${new Date().toISOString()} | ${req.method} ${req.url} | Origin: ${req.headers.origin}`);
   next();
 });
 
@@ -70,15 +36,13 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
-// Apply rate limiting - but disable for testing
-/*
+// Apply rate limiting with higher limits during testing
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 200, // higher limit for testing
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api', limiter);
-*/
 
 // Add a simple health check endpoint
 app.get('/api/health', (req, res) => {
