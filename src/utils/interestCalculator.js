@@ -1,5 +1,5 @@
-// src/utils/interestCalculator.js - Fixed version that handles all interest types
-const env = require('../config/env');
+// src/utils/interestCalculator.js
+require('dotenv').config();
 
 /**
  * Calculate simple interest for a given transaction
