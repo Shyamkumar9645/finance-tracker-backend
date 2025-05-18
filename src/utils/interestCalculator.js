@@ -30,12 +30,12 @@ exports.calculateSimpleInterest = (transaction, currentDate = new Date()) => {
       interestAmount: 0,
       totalWithInterest: parseFloat(transaction.amount || 0),
       daysElapsed: 0,
-      interestRate: parseFloat(transaction.interestRate || env.SIMPLE_INTEREST_ANNUAL_RATE)
+      interestRate: parseFloat(transaction.interestRate || process.env.SIMPLE_INTEREST_ANNUAL_RATE)
     };
   }
 
   // Get the interest rate (from transaction or fall back to env variable)
-  const annualRate = parseFloat(transaction.interestRate || env.SIMPLE_INTEREST_ANNUAL_RATE) / 100;
+  const annualRate = parseFloat(transaction.interestRate || process.env.SIMPLE_INTEREST_ANNUAL_RATE) / 100;
 
   // Calculate simple interest: Principal * Rate * Time
   // Time is in years (days / 365)
@@ -80,14 +80,14 @@ exports.calculateCompoundInterest = (transaction, currentDate = new Date()) => {
       interestAmount: 0,
       totalWithInterest: parseFloat(transaction.amount || 0),
       daysElapsed: 0,
-      interestRate: parseFloat(transaction.interestRate || env.COMPOUND_INTEREST_ANNUAL_RATE),
-      frequency: parseInt(transaction.compoundFrequency || env.COMPOUND_INTEREST_FREQUENCY)
+      interestRate: parseFloat(transaction.interestRate || process.env.COMPOUND_INTEREST_ANNUAL_RATE),
+      frequency: parseInt(transaction.compoundFrequency || process.env.COMPOUND_INTEREST_FREQUENCY)
     };
   }
 
   // Get the interest rate and compounding frequency
-  const annualRate = parseFloat(transaction.interestRate || env.COMPOUND_INTEREST_ANNUAL_RATE) / 100;
-  const compoundFrequency = parseInt(transaction.compoundFrequency || env.COMPOUND_INTEREST_FREQUENCY);
+  const annualRate = parseFloat(transaction.interestRate || process.env.COMPOUND_INTEREST_ANNUAL_RATE) / 100;
+  const compoundFrequency = parseInt(transaction.compoundFrequency || process.env.COMPOUND_INTEREST_FREQUENCY);
 
   // Calculate compound interest using the formula: P(1 + r/n)^(nt)
   // Where:
