@@ -1,3 +1,4 @@
+// src/models/Transaction.js - Verify field definitions
 'use strict';
 const { Model } = require('sequelize');
 
@@ -61,6 +62,27 @@ module.exports = (sequelize, DataTypes) => {
     reminderDate: {
       type: DataTypes.DATE,
       field: 'reminder_date'
+    },
+    // Interest fields
+    applyInterest: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'apply_interest',
+      allowNull: false // Ensure this is not null
+    },
+    interestType: {
+      type: DataTypes.ENUM('simple', 'compound', 'none'),
+      defaultValue: 'none',
+      field: 'interest_type',
+      allowNull: false // Ensure this is not null
+    },
+    interestRate: {
+      type: DataTypes.DECIMAL(5, 2),
+      field: 'interest_rate'
+    },
+    compoundFrequency: {
+      type: DataTypes.INTEGER,
+      field: 'compound_frequency'
     }
   }, {
     sequelize,
@@ -77,9 +99,27 @@ module.exports = (sequelize, DataTypes) => {
       {
         fields: ['transaction_date']
       }
-    ]
+    ],
+    // Add hooks to debug data being passed to the model
+    hooks: {
+      beforeCreate: (transaction, options) => {
+        console.log('Transaction before create values:', {
+          applyInterest: transaction.applyInterest,
+          interestType: transaction.interestType,
+          interestRate: transaction.interestRate,
+          compoundFrequency: transaction.compoundFrequency
+        });
+      },
+      afterCreate: (transaction, options) => {
+        console.log('Transaction after create values:', {
+          applyInterest: transaction.applyInterest,
+          interestType: transaction.interestType,
+          interestRate: transaction.interestRate,
+          compoundFrequency: transaction.compoundFrequency
+        });
+      }
+    }
   });
 
   return Transaction;
 };
-
