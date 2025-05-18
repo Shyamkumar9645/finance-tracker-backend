@@ -1,4 +1,5 @@
-// src/controllers/interestController.js
+// src/controllers/interestController.js - Fixed version
+
 const { Transaction, Person, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const { calculateInterest, calculateSimpleInterest, calculateCompoundInterest } = require('../utils/interestCalculator');
@@ -49,15 +50,14 @@ exports.getInterestSummary = async (req, res) => {
 
     // Build the where clause
     const whereClause = {
-      userId,
-      applyInterest: true
+      userId
     };
 
     if (personId) {
       whereClause.personId = personId;
     }
 
-    // Get all transactions with interest
+    // Get all transactions
     const transactions = await Transaction.findAll({
       where: whereClause,
       include: [
@@ -81,6 +81,7 @@ exports.getInterestSummary = async (req, res) => {
         daysElapsed: interest.simpleInterest.daysElapsed,
         interestType: transaction.interestType,
         interestRate: transaction.interestRate,
+        applyInterest: transaction.applyInterest,
         simpleInterest: interest.simpleInterest.interestAmount,
         simpleInterestTotal: interest.simpleInterest.totalWithInterest,
         compoundInterest: interest.compoundInterest.interestAmount,
@@ -127,12 +128,9 @@ exports.getPersonInterestSummary = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Get all transactions with interest grouped by person
+    // Get all transactions
     const transactions = await Transaction.findAll({
-      where: {
-        userId,
-        applyInterest: true
-      },
+      where: { userId },
       include: [
         {
           model: Person,
@@ -152,7 +150,8 @@ exports.getPersonInterestSummary = async (req, res) => {
         amount: parseFloat(transaction.amount),
         isMoneyReceived: transaction.isMoneyReceived,
         simpleInterest: interest.simpleInterest.interestAmount,
-        compoundInterest: interest.compoundInterest.interestAmount
+        compoundInterest: interest.compoundInterest.interestAmount,
+        applyInterest: transaction.applyInterest
       };
     });
 
@@ -220,21 +219,44 @@ exports.updateTransactionInterest = async (req, res) => {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    // Update interest settings
-    await transaction.update({
-      applyInterest: applyInterest !== undefined ? applyInterest : transaction.applyInterest,
-      interestType: interestType || transaction.interestType,
-      interestRate: interestRate !== undefined ? interestRate : transaction.interestRate,
-      compoundFrequency: compoundFrequency !== undefined ? compoundFrequency : transaction.compoundFrequency
-    });
+    // Create an update object with properly converted types
+    const updateData = {
+      applyInterest: applyInterest !== undefined
+        ? (applyInterest === true || applyInterest === 'true')
+        : transaction.applyInterest
+    };
+
+    // Only set interestType if applyInterest is true, otherwise force 'none'
+    if (updateData.applyInterest) {
+      updateData.interestType = interestType || transaction.interestType;
+    } else {
+      updateData.interestType = 'none';
+    }
+
+    // Handle interest rate and compound frequency
+    if (interestRate !== undefined) {
+      updateData.interestRate = interestRate ? parseFloat(interestRate) : null;
+    }
+
+    if (compoundFrequency !== undefined) {
+      updateData.compoundFrequency = compoundFrequency ? parseInt(compoundFrequency) : null;
+    }
+
+    console.log('Updating transaction interest settings:', updateData);
+
+    // Update transaction
+    await transaction.update(updateData);
+
+    // Fetch the updated transaction to ensure we return the correct data
+    const updatedTransaction = await Transaction.findByPk(id);
 
     // Calculate new interest amounts
     const currentDate = new Date();
-    const interestDetails = calculateInterest(transaction, currentDate);
+    const interestDetails = calculateInterest(updatedTransaction, currentDate);
 
     res.status(200).json({
       message: 'Transaction interest settings updated successfully',
-      transaction,
+      transaction: updatedTransaction,
       interestDetails
     });
   } catch (error) {

@@ -207,7 +207,22 @@ exports.updateTransaction = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
-    const { personId, amount, isMoneyReceived, transactionDate, description, category, paymentMethod, isSettled, reminderDate } = req.body;
+    const {
+      personId,
+      amount,
+      isMoneyReceived,
+      transactionDate,
+      description,
+      category,
+      paymentMethod,
+      isSettled,
+      reminderDate,
+      // Interest-related fields
+      applyInterest,
+      interestType,
+      interestRate,
+      compoundFrequency
+    } = req.body;
 
     // Find the transaction
     const transaction = await Transaction.findOne({
@@ -235,22 +250,69 @@ exports.updateTransaction = async (req, res) => {
       }
     }
 
-    // Update transaction
-    await transaction.update({
+    // Log the incoming update data
+    console.log('Updating transaction with data:', {
+      applyInterest,
+      interestType,
+      interestRate,
+      compoundFrequency
+    });
+
+    // Create an update object with properly converted types
+    const updateData = {
       personId: personId || transaction.personId,
-      amount: amount !== undefined ? amount : transaction.amount,
-      isMoneyReceived: isMoneyReceived !== undefined ? isMoneyReceived : transaction.isMoneyReceived,
+      amount: amount !== undefined ? parseFloat(amount) : transaction.amount,
+      isMoneyReceived: isMoneyReceived !== undefined
+        ? (isMoneyReceived === true || isMoneyReceived === 'true')
+        : transaction.isMoneyReceived,
       transactionDate: transactionDate || transaction.transactionDate,
       description: description !== undefined ? description : transaction.description,
       category: category !== undefined ? category : transaction.category,
       paymentMethod: paymentMethod !== undefined ? paymentMethod : transaction.paymentMethod,
-      isSettled: isSettled !== undefined ? isSettled : transaction.isSettled,
-      reminderDate: reminderDate !== undefined ? reminderDate : transaction.reminderDate
+      isSettled: isSettled !== undefined
+        ? (isSettled === true || isSettled === 'true')
+        : transaction.isSettled,
+      reminderDate: reminderDate !== undefined ? reminderDate : transaction.reminderDate,
+
+      // Interest fields with proper type conversion
+      applyInterest: applyInterest !== undefined
+        ? (applyInterest === true || applyInterest === 'true')
+        : transaction.applyInterest,
+    };
+
+    // Only set interestType if applyInterest is true, otherwise enforce 'none'
+    if (updateData.applyInterest) {
+      updateData.interestType = interestType || transaction.interestType;
+    } else {
+      updateData.interestType = 'none';
+    }
+
+    // Handle interest rate and compound frequency
+    if (interestRate !== undefined) {
+      updateData.interestRate = interestRate ? parseFloat(interestRate) : null;
+    }
+
+    if (compoundFrequency !== undefined) {
+      updateData.compoundFrequency = compoundFrequency ? parseInt(compoundFrequency) : null;
+    }
+
+    // Update transaction
+    await transaction.update(updateData);
+
+    // Fetch the updated transaction to ensure we return the correct data
+    const updatedTransaction = await Transaction.findByPk(id);
+
+    // Log the resulting transaction
+    console.log('Updated transaction result:', {
+      applyInterest: updatedTransaction.applyInterest,
+      interestType: updatedTransaction.interestType,
+      interestRate: updatedTransaction.interestRate,
+      compoundFrequency: updatedTransaction.compoundFrequency
     });
 
     res.status(200).json({
       message: 'Transaction updated successfully',
-      transaction
+      transaction: updatedTransaction
     });
   } catch (error) {
     console.error('Update transaction error:', error);
