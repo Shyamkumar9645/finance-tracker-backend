@@ -6,7 +6,23 @@ const { Parser } = require('json2csv');
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
   try {
-    const { personId, amount, isMoneyReceived, transactionDate, description, category, paymentMethod, isSettled, reminderDate } = req.body;
+    const {
+      personId,
+      amount,
+      isMoneyReceived,
+      transactionDate,
+      description,
+      category,
+      paymentMethod,
+      isSettled,
+      reminderDate,
+      // Interest-related fields
+      applyInterest,
+      interestType,
+      interestRate,
+      compoundFrequency
+    } = req.body;
+
     const userId = req.user.id;
 
     // Validate input
@@ -26,18 +42,35 @@ exports.createTransaction = async (req, res) => {
       return res.status(404).json({ error: 'Person not found' });
     }
 
-    // Create transaction
+    // Create transaction with explicit boolean conversion for booleans
+    // and proper parsing for numeric values
     const transaction = await Transaction.create({
       userId,
       personId,
-      amount,
-      isMoneyReceived,
+      amount: parseFloat(amount),
+      isMoneyReceived: isMoneyReceived === true || isMoneyReceived === 'true',
       transactionDate,
-      description,
-      category,
-      paymentMethod,
-      isSettled,
-      reminderDate
+      description: description || '',
+      category: category || '',
+      paymentMethod: paymentMethod || '',
+      isSettled: isSettled === true || isSettled === 'true',
+      reminderDate: reminderDate || null,
+
+      // Interest fields with proper type conversion
+      applyInterest: applyInterest === true || applyInterest === 'true',
+      interestType: (applyInterest === true || applyInterest === 'true')
+        ? (interestType || 'none')
+        : 'none',
+      interestRate: interestRate ? parseFloat(interestRate) : null,
+      compoundFrequency: compoundFrequency ? parseInt(compoundFrequency) : null
+    });
+
+    // Add debugging console log
+    console.log("Transaction created with interest fields:", {
+      applyInterest: transaction.applyInterest,
+      interestType: transaction.interestType,
+      interestRate: transaction.interestRate,
+      compoundFrequency: transaction.compoundFrequency
     });
 
     res.status(201).json({
@@ -49,7 +82,6 @@ exports.createTransaction = async (req, res) => {
     res.status(500).json({ error: 'Failed to create transaction. Please try again.' });
   }
 };
-
 // Get all transactions for the current user
 exports.getTransactions = async (req, res) => {
   try {
