@@ -61,6 +61,25 @@ module.exports = (sequelize, DataTypes) => {
     reminderDate: {
       type: DataTypes.DATE,
       field: 'reminder_date'
+    },
+    // New fields for interest calculations
+    applyInterest: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'apply_interest'
+    },
+    interestType: {
+      type: DataTypes.ENUM('simple', 'compound', 'none'),
+      defaultValue: 'none',
+      field: 'interest_type'
+    },
+    interestRate: {
+      type: DataTypes.DECIMAL(5, 2),
+      field: 'interest_rate'
+    },
+    compoundFrequency: {
+      type: DataTypes.INTEGER,
+      field: 'compound_frequency'
     }
   }, {
     sequelize,
@@ -82,4 +101,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return Transaction;
 };
-
