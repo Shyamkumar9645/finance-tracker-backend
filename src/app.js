@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 app.use(cors({
-  origin: ['https://personal-finance-tracker-54et.onrender.com', 'http://localhost:3000'],
+  origin: ['https://personal-finance-tracker-ia63.onrender.com', 'http://localhost:3000'],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
   credentials: true
