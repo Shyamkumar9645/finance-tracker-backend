@@ -1,27 +1,51 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     try {
-      // Get the ID of Srinu, since person is already in database
-      const srinu = await queryInterface.sequelize.query(
-        `SELECT id FROM people WHERE name = 'Srinu' LIMIT 1`,
+      // Instead of searching for the person, let's create a person directly
+      console.log('Creating person "Srinu"...');
+
+      // First check if the person already exists to avoid duplicates
+      const existingPerson = await queryInterface.sequelize.query(
+        "SELECT id FROM people WHERE name = 'Srinu' LIMIT 1",
         { type: queryInterface.sequelize.QueryTypes.SELECT }
       );
 
-      if (!srinu || srinu.length === 0) {
-        throw new Error("Person 'Srinu' not found in database. Please make sure Srinu exists in the database first.");
-      }
+      let personId;
 
-      const srinuId = srinu[0].id;
-      console.log(`Found Srinu with ID: ${srinuId}`);
+      if (existingPerson && existingPerson.length > 0) {
+        // Person exists, use their ID
+        personId = existingPerson[0].id;
+        console.log(`Person already exists with ID: ${personId}`);
+      } else {
+        // Person doesn't exist, create them
+        const newPerson = await queryInterface.bulkInsert('people', [{
+          user_id: 1,
+          name: 'Srinu',
+          created_at: new Date(),
+          updated_at: new Date()
+        }], { returning: true });
+
+        // If returning: true doesn't work in your setup, we need to query to get the ID
+        if (newPerson && newPerson[0] && newPerson[0].id) {
+          personId = newPerson[0].id;
+        } else {
+          // Get the ID by querying for the newly created person
+          const justCreatedPerson = await queryInterface.sequelize.query(
+            "SELECT id FROM people WHERE name = 'Srinu' LIMIT 1",
+            { type: queryInterface.sequelize.QueryTypes.SELECT }
+          );
+          personId = justCreatedPerson[0].id;
+        }
+        console.log(`Created new person with ID: ${personId}`);
+      }
 
       // All transactions are for Srinu
       const srinuTransactions = [
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 100000.00,
           is_money_received: false,
           transaction_date: new Date(), // Current date as no specific date mentioned
@@ -36,7 +60,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 35000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -51,7 +75,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 5000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -66,7 +90,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 2000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -81,7 +105,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 10000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -96,7 +120,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 50000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -111,7 +135,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 1069702.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -127,7 +151,7 @@ module.exports = {
         // Total noted as 1469702 but this appears to be a summation, not a transaction
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 10000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -142,7 +166,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 10000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -157,7 +181,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 6500.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -172,7 +196,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 7500.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -187,7 +211,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 6500.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -202,7 +226,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 1000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -217,7 +241,7 @@ module.exports = {
         },
         {
           user_id: 1,
-          person_id: srinuId,
+          person_id: personId,
           amount: 4000.00,
           is_money_received: false,
           transaction_date: new Date(),
@@ -289,11 +313,11 @@ module.exports = {
         return Promise.resolve();
       }
 
-      const srinuId = srinu[0].id;
+      const personId = srinu[0].id;
 
       // Delete transactions for Srinu
       const deleteResult = await queryInterface.bulkDelete('transactions', {
-        person_id: srinuId
+        person_id: personId
       });
 
       console.log(`Deleted ${deleteResult} transactions for Srinu`);

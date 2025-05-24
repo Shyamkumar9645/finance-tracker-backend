@@ -4,11 +4,11 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
       // Instead of searching for the person, let's create a person directly
-      console.log('Creating person "Ravi Bava- Sharadha akka"...');
+      console.log('Creating person "raviBava_sharadha_akka"...');
 
       // First check if the person already exists to avoid duplicates
       const existingPerson = await queryInterface.sequelize.query(
-        "SELECT id FROM people WHERE name = 'Ravi Bava- Sharadha akka' LIMIT 1",
+        "SELECT id FROM people WHERE name = 'raviBava_sharadha_akka' LIMIT 1",
         { type: queryInterface.sequelize.QueryTypes.SELECT }
       );
 
@@ -22,7 +22,8 @@ module.exports = {
         // Person doesn't exist, create them
         const newPerson = await queryInterface.bulkInsert('people', [{
           user_id: 1,
-          name: 'Ravi Bava- Sharadha akka',
+          name: 'raviBava_sharadha_akka',
+          
           created_at: new Date(),
           updated_at: new Date()
         }], { returning: true });
@@ -33,7 +34,7 @@ module.exports = {
         } else {
           // Get the ID by querying for the newly created person
           const justCreatedPerson = await queryInterface.sequelize.query(
-            "SELECT id FROM people WHERE name = 'Ravi Bava- Sharadha akka' LIMIT 1",
+            "SELECT id FROM people WHERE name = 'raviBava_sharadha_akka' LIMIT 1",
             { type: queryInterface.sequelize.QueryTypes.SELECT }
           );
           personId = justCreatedPerson[0].id;
@@ -52,6 +53,7 @@ module.exports = {
           description: 'Loan Given',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -64,6 +66,7 @@ module.exports = {
           description: 'Marriage Amount (Sunday)',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -76,6 +79,7 @@ module.exports = {
           description: 'Train Tickets',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -88,6 +92,7 @@ module.exports = {
           description: 'Loan Given',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -100,6 +105,7 @@ module.exports = {
           description: 'Amount Returned',
           payment_method: 'Cash',
           is_settled: true,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -112,6 +118,7 @@ module.exports = {
           description: 'Loan Given',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -124,6 +131,7 @@ module.exports = {
           description: 'Loan Given',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -136,6 +144,7 @@ module.exports = {
           description: 'Loan Given',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -148,6 +157,7 @@ module.exports = {
           description: 'Net amount from 50000-40000',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -160,6 +170,7 @@ module.exports = {
           description: 'Credit Card Vamshi',
           payment_method: 'Credit Card',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -172,6 +183,7 @@ module.exports = {
           description: 'Vamshi Monitor',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -184,6 +196,7 @@ module.exports = {
           description: 'Computer Own -> Life Style',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -196,6 +209,7 @@ module.exports = {
           description: 'Sour Cake (2500-1150)',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         },
@@ -208,6 +222,7 @@ module.exports = {
           description: 'Bhadra Singh Ann',
           payment_method: 'Cash',
           is_settled: false,
+          
           created_at: new Date(),
           updated_at: new Date()
         }
@@ -225,7 +240,7 @@ module.exports = {
     try {
       // Get the person ID
       const person = await queryInterface.sequelize.query(
-        "SELECT id FROM people WHERE name = 'Ravi Bava- Sharadha akka' LIMIT 1",
+        "SELECT id FROM people WHERE name = 'raviBava_sharadha_akka' LIMIT 1",
         { type: queryInterface.sequelize.QueryTypes.SELECT }
       );
 
