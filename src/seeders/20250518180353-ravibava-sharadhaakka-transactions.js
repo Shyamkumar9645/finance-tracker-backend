@@ -83,32 +83,8 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date()
         },
-        {
-          user_id: 1,
-          person_id: personId,
-          amount: 25000.00,
-          is_money_received: false,
-          transaction_date: '2023-09-14 00:00:00+00',
-          description: 'Loan Given',
-          payment_method: 'Cash',
-          is_settled: false,
-          
-          created_at: new Date(),
-          updated_at: new Date()
-        },
-        {
-          user_id: 1,
-          person_id: personId,
-          amount: 50000.00,
-          is_money_received: true,
-          transaction_date: '2023-09-14 00:00:00+00',
-          description: 'Amount Returned',
-          payment_method: 'Cash',
-          is_settled: true,
-          
-          created_at: new Date(),
-          updated_at: new Date()
-        },
+
+
         {
           user_id: 1,
           person_id: personId,
@@ -138,7 +114,7 @@ module.exports = {
         {
           user_id: 1,
           person_id: personId,
-          amount: 19000.00,
+          amount: 10000.00,
           is_money_received: false,
           transaction_date: '2024-11-10 00:00:00+00',
           description: 'Loan Given',
@@ -148,19 +124,7 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date()
         },
-        {
-          user_id: 1,
-          person_id: personId,
-          amount: 10000.00,
-          is_money_received: false,
-          transaction_date: '2024-11-11 00:00:00+00',
-          description: 'Net amount from 50000-40000',
-          payment_method: 'Cash',
-          is_settled: false,
-          
-          created_at: new Date(),
-          updated_at: new Date()
-        },
+
         {
           user_id: 1,
           person_id: personId,

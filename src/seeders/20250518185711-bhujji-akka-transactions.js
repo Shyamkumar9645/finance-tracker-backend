@@ -137,7 +137,7 @@ interest_rate: 24.00,
         {
           user_id: 1,
           person_id: personId,
-          amount: 5267.00,
+          amount: 52167.00,
           is_money_received: false,
           transaction_date: '2022-11-15',
           description: 'Given to Bhujji Akka',
