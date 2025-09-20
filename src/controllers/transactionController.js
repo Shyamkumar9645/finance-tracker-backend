@@ -2,6 +2,32 @@
 const { Transaction, Person, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const { Parser } = require('json2csv');
+const fs = require('fs');
+const path = require('path');
+
+const logTransaction = (transaction) => {
+  const logFilePath = path.join(__dirname, '../../transactions.log');
+  const logData = {
+    user_id: transaction.userId,
+    person_id: transaction.personId,
+    amount: transaction.amount,
+    is_money_received: transaction.isMoneyReceived,
+    transaction_date: transaction.transactionDate,
+    description: transaction.description,
+    payment_method: transaction.paymentMethod,
+    is_settled: transaction.isSettled,
+    apply_interest: transaction.applyInterest,
+    interest_type: transaction.interestType,
+    interest_rate: transaction.interestRate,
+    created_at: new Date(),
+    updated_at: new Date()
+  };
+  fs.appendFile(logFilePath, JSON.stringify(logData, null, 2) + '\n', (err) => {
+    if (err) {
+      console.error('Failed to log transaction:', err);
+    }
+  });
+};
 
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
@@ -77,6 +103,7 @@ exports.createTransaction = async (req, res) => {
       message: 'Transaction created successfully',
       transaction
     });
+    logTransaction(transaction);
   } catch (error) {
     console.error('Create transaction error:', error);
     res.status(500).json({ error: 'Failed to create transaction. Please try again.' });
