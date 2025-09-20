@@ -190,6 +190,20 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date()
         }
+        ,
+                {
+                  user_id: 1,
+                  person_id: personId,
+                  amount: 2000.00,
+                  is_money_received: true,
+                  transaction_date: '2025-07-25 00:00:00+00',
+                  description: 'Teej Item',
+                  payment_method: 'Cash',
+                  is_settled: false,
+
+                  created_at: new Date(),
+                  updated_at: new Date()
+                }
       ];
 
       console.log(`Inserting ${transactions.length} transactions`);

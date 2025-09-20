@@ -3,8 +3,8 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
-      // Instead of searching for the person, let's create a person directly
-      console.log('Creating person "chinni"...');
+      // Instead of searching for the person, let’s create a person directly
+      console.log('Creating person "chinni"…');
 
       // First check if the person already exists to avoid duplicates
       const existingPerson = await queryInterface.sequelize.query(
@@ -41,69 +41,83 @@ module.exports = {
         console.log(`Created new person with ID: ${personId}`);
       }
 
-      // All transactions are for chinni
+      // All transactions are for chinni based on your handwritten notes
       const chinniTransactions = [
         {
-            user_id: 1,
-            person_id: personId,
-            amount: 10000.00,
-            is_money_received: true,
-            transaction_date: '2025-05-18',
-            description: 'Out of 40000 Rupees, Chinni has given 30000. Pending 10k.',
-            payment_method: 'Cash',
-            is_settled: false,
-            apply_interest: true,
-            interest_type: 'simple',
-            interest_rate: 24.00,
-            created_at: new Date(),
-            updated_at: new Date()
-          },
-          {
-            user_id: 1,
-            person_id: personId,
-            amount: 2000.00,
-            is_money_received: true,
-            transaction_date: '2024-12-12',
-            description: 'Received via UPI',
-            payment_method: 'UPI',
-            is_settled: false,
-            apply_interest: true,
-            interest_type: 'simple',
-            interest_rate: 24.00,
-            created_at: new Date(),
-            updated_at: new Date()
-          },
-          {
-            user_id: 1,
-            person_id: personId,
-            amount: 2000.00,
-            is_money_received: true,
-            transaction_date: '2024-06-19',
-            description: 'Received via PhonePe',
-            payment_method: 'UPI',
-            is_settled: false,
-            apply_interest: true,
-            interest_type: 'simple',
-            interest_rate: 24.00,
-            created_at: new Date(),
-            updated_at: new Date()
-          },
-          {
-            user_id: 1,
-            person_id: personId,
-            amount: 2000.00,
-            is_money_received: true,
-            transaction_date: '2022-05-04',
-            description: 'Received via UPI',
-            payment_method: 'UPI',
-            is_settled: false,
-            apply_interest: true,
-            interest_type: 'simple',
-            interest_rate: 24.00,
-            created_at: new Date(),
-            updated_at: new Date()
-          },
-        // The last entry appears to be a calculation or summary (500+6500+1000+100+500), not a transaction
+          user_id: 1,
+          person_id: personId,
+          amount: 5000.00,
+          is_money_received: false, // Money given to chinni
+          transaction_date: '2025-09-04',
+          description: 'Given via UPI',
+          payment_method: 'UPI',
+          is_settled: false,
+          apply_interest: true,
+          interest_type: 'simple',
+          interest_rate: 24.00,
+          created_at: new Date(),
+          updated_at: new Date()
+        },
+        {
+          user_id: 1,
+          person_id: personId,
+          amount: 10000.00,
+          is_money_received: false, // Money given to chinni
+          transaction_date: '2025-05-18',
+          description: 'Out of 40000 Rupees, Chinni has given 30000. Pending 10k.',
+          payment_method: 'Cash',
+          is_settled: false,
+          apply_interest: true,
+          interest_type: 'simple',
+          interest_rate: 24.00,
+          created_at: new Date(),
+          updated_at: new Date()
+        },
+        {
+          user_id: 1,
+          person_id: personId,
+          amount: 2000.00,
+          is_money_received: false, // Money given to chinni
+          transaction_date: '2024-12-12',
+          description: 'Given via UPI',
+          payment_method: 'UPI',
+          is_settled: false,
+          apply_interest: true,
+          interest_type: 'simple',
+          interest_rate: 24.00,
+          created_at: new Date(),
+          updated_at: new Date()
+        },
+        {
+          user_id: 1,
+          person_id: personId,
+          amount: 2000.00,
+          is_money_received: false, // Money given to chinni
+          transaction_date: '2024-06-18',
+          description: 'Given via PhonePe',
+          payment_method: 'UPI',
+          is_settled: false,
+          apply_interest: true,
+          interest_type: 'simple',
+          interest_rate: 24.00,
+          created_at: new Date(),
+          updated_at: new Date()
+        },
+        {
+          user_id: 1,
+          person_id: personId,
+          amount: 2000.00,
+          is_money_received: false, // Money given to chinni
+          transaction_date: '2022-05-04',
+          description: 'Given via UPI',
+          payment_method: 'UPI',
+          is_settled: false,
+          apply_interest: true,
+          interest_type: 'simple',
+          interest_rate: 24.00,
+          created_at: new Date(),
+          updated_at: new Date()
+        }
       ];
 
       // Check if transactions already exist to avoid duplicates
@@ -112,11 +126,13 @@ module.exports = {
           `SELECT COUNT(*) as count FROM transactions
            WHERE person_id = :personId
            AND amount = :amount
+           AND transaction_date = :transactionDate
            AND is_money_received = :isMoneyReceived`,
           {
             replacements: {
               personId: transaction.person_id,
               amount: transaction.amount,
+              transactionDate: transaction.transaction_date,
               isMoneyReceived: transaction.is_money_received
             },
             type: queryInterface.sequelize.QueryTypes.SELECT
@@ -135,12 +151,16 @@ module.exports = {
         if (!exists) {
           await queryInterface.bulkInsert('transactions', [transaction]);
           insertedCount++;
+          console.log(`Inserted transaction: ${transaction.amount} on ${transaction.transaction_date}`);
         } else {
           skippedCount++;
+          console.log(`Skipped duplicate transaction: ${transaction.amount} on ${transaction.transaction_date}`);
         }
       }
 
-      console.log(`Inserted ${insertedCount} transactions for chinni, skipped ${skippedCount} existing transactions.`);
+      console.log(`Summary: Inserted ${insertedCount} transactions for chinni, skipped ${skippedCount} existing transactions.`);
+      console.log(`Total amount given to chinni: ${chinniTransactions.reduce((sum, t) => sum + t.amount, 0)}`);
+
       return Promise.resolve();
 
     } catch (error) {
@@ -149,9 +169,9 @@ module.exports = {
     }
   },
 
-  async down(queryInterface, Sequelize) {
+  down: async (queryInterface, Sequelize) => {
     try {
-      // Get chinni's ID
+      // Get chinni’s ID
       const chinni = await queryInterface.sequelize.query(
         `SELECT id FROM people WHERE name = 'chinni' LIMIT 1`,
         { type: queryInterface.sequelize.QueryTypes.SELECT }
@@ -169,7 +189,12 @@ module.exports = {
         person_id: personId
       });
 
-      console.log(`Deleted ${deleteResult} transactions for chinni`);
+      console.log(`Deleted transactions for chinni (person_id: ${personId})`);
+
+      // Optionally delete the person as well (uncomment if needed)
+      // await queryInterface.bulkDelete('people', { id: personId });
+      // console.log(`Deleted person chinni (id: ${personId})`);
+
       return Promise.resolve();
     } catch (error) {
       console.error('Error in down method:', error);

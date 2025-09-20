@@ -46,9 +46,9 @@ module.exports = {
         {
             user_id: 1,
             person_id: personId,
-            amount: 6172.00,
+            amount: 6058.00,
             is_money_received: false,
-            transaction_date: '2024-09-16',
+            transaction_date: '2025-06-30',
             description: 'Phone Emi',
             payment_method: 'UPI',
             is_settled: false,

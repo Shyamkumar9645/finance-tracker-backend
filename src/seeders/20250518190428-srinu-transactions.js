@@ -91,7 +91,7 @@ module.exports = {
         {
           user_id: 1,
           person_id: personId,
-          amount: 2000.00,
+          amount: 200000.00,
           is_money_received: false,
           transaction_date: new Date(),
           description: 'Given to Srinu',
@@ -180,6 +180,21 @@ module.exports = {
           updated_at: new Date()
         },
         {
+                  user_id: 1,
+                  person_id: personId,
+                  amount: 10000.00,
+                  is_money_received: false,
+                  transaction_date: new Date(),
+                  description: 'Given to Srinu',
+                  payment_method: 'Cash',
+                  is_settled: false,
+                  apply_interest: true,
+                  interest_type: 'simple',
+                  interest_rate: 24.00,
+                  created_at: new Date(),
+                  updated_at: new Date()
+                },
+        {
           user_id: 1,
           person_id: personId,
           amount: 6500.00,
@@ -197,7 +212,7 @@ module.exports = {
         {
           user_id: 1,
           person_id: personId,
-          amount: 7500.00,
+          amount: 1500.00,
           is_money_received: false,
           transaction_date: new Date(),
           description: 'Given to Srinu',
@@ -254,6 +269,21 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date()
         },
+        {
+                  user_id: 1,
+                  person_id: personId,
+                  amount: 8600.00,
+                  is_money_received: false,
+                  transaction_date: new Date(),
+                  description: 'Given to Srinu',
+                  payment_method: 'Cash',
+                  is_settled: false,
+                  apply_interest: true,
+                  interest_type: 'simple',
+                  interest_rate: 24.00,
+                  created_at: new Date(),
+                  updated_at: new Date()
+                },
         // The last entry appears to be a calculation or summary (500+6500+1000+100+500), not a transaction
       ];
 

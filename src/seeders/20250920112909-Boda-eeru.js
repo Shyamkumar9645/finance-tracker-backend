@@ -4,11 +4,11 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
       // Instead of searching for the person, let's create a person directly
-      console.log('Creating person "rajitha_akka"...');
+      console.log('Creating person "boda_eeru"...');
 
       // First check if the person already exists to avoid duplicates
       const existingPerson = await queryInterface.sequelize.query(
-        "SELECT id FROM people WHERE name = 'rajitha_akka' LIMIT 1",
+        "SELECT id FROM people WHERE name = 'boda_eeru' LIMIT 1",
         { type: queryInterface.sequelize.QueryTypes.SELECT }
       );
 
@@ -22,7 +22,7 @@ module.exports = {
         // Person doesn't exist, create them
         const newPerson = await queryInterface.bulkInsert('people', [{
           user_id: 1,
-          name: 'rajitha_akka',
+          name: 'boda_eeru',
           created_at: new Date(),
           updated_at: new Date()
         }], { returning: true });
@@ -33,7 +33,7 @@ module.exports = {
         } else {
           // Get the ID by querying for the newly created person
           const justCreatedPerson = await queryInterface.sequelize.query(
-            "SELECT id FROM people WHERE name = 'rajitha_akka' LIMIT 1",
+            "SELECT id FROM people WHERE name = 'boda_eeru' LIMIT 1",
             { type: queryInterface.sequelize.QueryTypes.SELECT }
           );
           personId = justCreatedPerson[0].id;
@@ -41,20 +41,20 @@ module.exports = {
         console.log(`Created new person with ID: ${personId}`);
       }
 
-      // All transactions are for rajitha_akka
-      const rajitha_akkaTransactions = [
+      // All transactions are for boda_eeru
+      const boda_eeruTransactions = [
         {
             user_id: 1,
             person_id: personId,
-            amount: 0.00,
+            amount: 19800.00,
             is_money_received: false,
-            transaction_date: '2025-05-16',
-            description: 'Transferred to Shankar Bava via PhonePe',
+            transaction_date: '2025-02-01',
+            description: 'interest amount',
             payment_method: 'UPI',
             is_settled: false,
             apply_interest: false,
             interest_type: 'simple',
-            interest_rate: 24.00,
+            interest_rate: 0.00,
             created_at: new Date(),
             updated_at: new Date()
           },
@@ -85,7 +85,7 @@ module.exports = {
       let skippedCount = 0;
 
       // Insert transactions one by one, checking for duplicates
-      for (const transaction of rajitha_akkaTransactions) {
+      for (const transaction of boda_eeruTransactions) {
         const exists = await checkTransaction(transaction);
         if (!exists) {
           await queryInterface.bulkInsert('transactions', [transaction]);
@@ -95,7 +95,7 @@ module.exports = {
         }
       }
 
-      console.log(`Inserted ${insertedCount} transactions for rajitha_akka, skipped ${skippedCount} existing transactions.`);
+      console.log(`Inserted ${insertedCount} transactions for boda_eeru, skipped ${skippedCount} existing transactions.`);
       return Promise.resolve();
 
     } catch (error) {
@@ -106,25 +106,25 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     try {
-      // Get rajitha_akka's ID
-      const rajitha_akka = await queryInterface.sequelize.query(
-        `SELECT id FROM people WHERE name = 'rajitha_akka' LIMIT 1`,
+      // Get boda_eeru's ID
+      const boda_eeru = await queryInterface.sequelize.query(
+        `SELECT id FROM people WHERE name = 'boda_eeru' LIMIT 1`,
         { type: queryInterface.sequelize.QueryTypes.SELECT }
       );
 
-      if (!rajitha_akka || rajitha_akka.length === 0) {
-        console.log("rajitha_akka not found, nothing to delete");
+      if (!boda_eeru || boda_eeru.length === 0) {
+        console.log("boda_eeru not found, nothing to delete");
         return Promise.resolve();
       }
 
-      const personId = rajitha_akka[0].id;
+      const personId = boda_eeru[0].id;
 
-      // Delete transactions for rajitha_akka
+      // Delete transactions for boda_eeru
       const deleteResult = await queryInterface.bulkDelete('transactions', {
         person_id: personId
       });
 
-      console.log(`Deleted ${deleteResult} transactions for rajitha_akka`);
+      console.log(`Deleted ${deleteResult} transactions for boda_eeru`);
       return Promise.resolve();
     } catch (error) {
       console.error('Error in down method:', error);
